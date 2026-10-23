@@ -25,6 +25,11 @@ Ecology and Evolution, https://doi.org/10.1002/ece3.4687.
 1. `renv::restore()`
 2. `targets::tar_make()` from the project root. It writes `data/clean/folivory_clean.csv` and renders `report.html`.
 
+## Licence
+
+The code (`R/`, `_targets.R`, `report.qmd`) is released under the MIT licence (see `LICENSE`).
+The data are not covered by it: they keep their original CC0 1.0 licence from the Dryad record.
+
 ## Limitations
 
 To be completed.
