@@ -1,35 +1,26 @@
-# Finse exercise: reproducible workflow with *Fragaria vesca* data
+# Finse exercise: *Fragaria vesca* folivory data
 
-Exercise for the UiB PhD course "Open, Reproducible and Transparent Science"
-(Finse, October 2026), built with `targets`, `renv` and Quarto.
+Reproducible workflow (`targets`, `renv`, Quarto) for the UiB course "Open, Reproducible and Transparent Science" (Finse, 2026).
 
-## Data
+## Run
 
-Muola, A., & Stenberg, J. A. (2018). *Data from: Folivory has long-term effects on
-sexual but not on asexual reproduction in woodland strawberry* [Dataset]. Dryad.
-https://doi.org/10.5061/dryad.69r593t. Licence CC0 1.0. Paper: Muola & Stenberg (2018),
-Ecology and Evolution, https://doi.org/10.1002/ece3.4687.
+From the project root, in R:
 
-- `data/raw/`: the original Excel file, never edited (md5 `ddf5756b78fc20ea4f7db678166295f1`, matches the record).
-- `data/csv/`: a CSV copy of each sheet (`data` and the codebook `code`), exported once with no cleaning and checked equal to the sheets (see `report.qmd`).
-- `data/clean/`: the cleaned data, written by the pipeline.
+```r
+renv::restore()
+targets::tar_make()  # writes data/clean/folivory_clean.csv and report.html
+```
 
-## Files
+## Contents
 
-- `R/clean_folivory.R`: the cleaning function.
-- `_targets.R`: the pipeline (read, clean, write, render the report).
-- `report.qmd`: reproducible document explaining and checking each step.
+- `data/raw/` original Excel file (never edited); `data/csv/` CSV copy of each sheet; `data/clean/` cleaned data.
+- `R/` the cleaning and plotting functions; `_targets.R` the pipeline; `report.qmd` the report.
 
-## How to run (to be completed)
+## Data and licence
 
-1. `renv::restore()`
-2. `targets::tar_make()` from the project root. It writes `data/clean/folivory_clean.csv` and renders `report.html`.
-
-## Licence
-
-The code (`R/`, `_targets.R`, `report.qmd`) is released under the MIT licence (see `LICENSE`).
-The data are not covered by it: they keep their original CC0 1.0 licence from the Dryad record.
+Muola & Stenberg (2018), *Data from: Folivory has long-term effects on sexual but not on asexual reproduction in woodland strawberry*, Dryad, https://doi.org/10.5061/dryad.69r593t (CC0 1.0). Paper: https://doi.org/10.1002/ece3.4687.
+The code is MIT-licensed (`LICENSE`); the data keep their CC0 licence.
 
 ## Limitations
 
-To be completed.
+The figure is descriptive (no model or test). The cleaned CSV stores factor labels but not their order; use the `folivory_clean` target in analyses.

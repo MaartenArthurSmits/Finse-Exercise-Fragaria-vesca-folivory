@@ -2,7 +2,7 @@
 # Course ref: Thursday "reproducible workflows" (targets); guide section T.
 library(targets)
 
-# Loads clean_folivory() from R/
+# Loads clean_folivory() and plot_fruits() from R/
 tar_source("R")
 
 list(
@@ -23,6 +23,7 @@ list(
     },
     format = "file"
   ),
+  tar_target(fruit_figure, plot_fruits(folivory_clean)),
   # Renders report.qmd after the targets it reads with tar_read()
   tarchetypes::tar_quarto(report, "report.qmd")
 )
