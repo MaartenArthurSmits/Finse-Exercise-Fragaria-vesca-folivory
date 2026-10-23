@@ -1,5 +1,8 @@
 ---
 title: "Reproducing the folivory data: from the raw file to the cleaned table"
+format:
+  html:
+    embed-resources: true
 ---
 
 This report shows how `data/clean/folivory_clean.csv` is obtained from the published raw data, and checks each step. To reproduce it, run from the project root:
