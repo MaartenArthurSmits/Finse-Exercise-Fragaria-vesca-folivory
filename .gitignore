@@ -1,0 +1,20 @@
+# Local-only material: course files, status notes and paper PDFs.
+# PDFs are not redistributed (licences differ; cite by DOI instead).
+local/
+
+# R session state: start every analysis from scripts, not saved workspaces
+.Rhistory
+.RData
+.Rproj.user/
+
+# Rebuilt by renv::restore() and targets::tar_make()
+renv/library/
+renv/staging/
+_targets/
+
+# Excel lock files (appear when a workbook is open)
+~$*
+
+# Rendered Quarto intermediates
+*_files/
+.quarto/

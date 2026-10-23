@@ -1,0 +1,144 @@
+---
+title: "Reproducing the folivory data: from the raw file to the cleaned table"
+---
+
+This document shows how the cleaned data in `data/clean/folivory_clean.csv` are obtained from the published raw file, and lets a reader check each step. It is rendered by the pipeline, so every table below comes from the code in this repository.
+
+# How to reproduce
+
+Run these from the project root (the folder containing `README.md`).
+
+In the R console:
+
+```r
+renv::restore()      # install the package versions recorded in renv.lock
+targets::tar_make()  # clean the data and render this report (report.html)
+```
+
+Or only render this document, using the targets already built:
+
+```bash
+quarto render report.qmd
+```
+
+```{r}
+#| label: load-packages
+library(dplyr)
+library(knitr)
+```
+
+# Data source
+
+Muola & Stenberg (2018), Dryad dataset [10.5061/dryad.69r593t](https://doi.org/10.5061/dryad.69r593t), licence CC0 1.0. The paper is [10.1002/ece3.4687](https://doi.org/10.1002/ece3.4687). The raw Excel file is kept unedited in `data/raw/`; its checksum is compared with the one on the dataset record.
+
+```{r}
+#| label: tbl-md5
+#| tbl-cap: "Raw-file checksum against the dataset record."
+raw_xlsx <- list.files("data/raw", pattern = "xlsx$", full.names = TRUE)
+record_md5 <- "ddf5756b78fc20ea4f7db678166295f1"
+kable(tibble::tibble(
+  file = basename(raw_xlsx),
+  computed = unname(tools::md5sum(raw_xlsx)),
+  matches_record = computed == record_md5
+))
+```
+
+# From Excel to CSV
+
+The workbook has two sheets: `data` (186 plants) and `code`, the authors' codebook with units and level definitions. Each sheet was exported once to `data/csv/` with `readxl::read_excel(.name_repair = "minimal")` and `write.csv()`, with no cleaning. To check that nothing was changed, the export is repeated in memory and compared with the CSV files in the repository:
+
+```{r}
+#| label: tbl-csv-check
+#| tbl-cap: "Each committed CSV against its Excel sheet."
+kable(bind_rows(lapply(readxl::excel_sheets(raw_xlsx), function(s) {
+  x <- as.data.frame(readxl::read_excel(raw_xlsx, sheet = s, .name_repair = "minimal"))
+  y <- read.csv(file.path("data/csv", paste0("folivory_", s, ".csv")), check.names = FALSE, na.strings = "")
+  tibble::tibble(sheet = s, rows = nrow(x), columns = ncol(x), same_values = isTRUE(all.equal(x, y, check.attributes = FALSE)))
+})))
+```
+
+# Cleaning
+
+`clean_folivory()` does the cleaning. Its source is shown below; this cell also defines the function for the rest of the document.
+
+```{r}
+#| label: clean-function
+#| file: R/clean_folivory.R
+```
+
+## Missing values
+
+The authors code missing values as `"."`. Read naively, six numeric columns become text; reading with `na.strings = c("", ".")` fixes this.
+
+```{r}
+#| label: read-data
+folivory_csv <- targets::tar_read(folivory_csv)
+folivory_raw <- targets::tar_read(folivory_raw)
+folivory_clean <- targets::tar_read(folivory_clean)
+naive <- read.csv(folivory_csv)
+```
+
+```{r}
+#| label: tbl-type-change
+#| tbl-cap: "Columns that change type when `na.strings = c('', '.')` is used."
+kable(
+  tibble::tibble(
+    column = names(naive),
+    type_naive = vapply(naive, function(x) class(x)[1], character(1)),
+    type_na_strings = vapply(folivory_raw, function(x) class(x)[1], character(1)),
+    dots = vapply(naive, function(x) sum(x == ".", na.rm = TRUE), integer(1))
+  ) |>
+    filter(type_naive != type_na_strings)
+)
+```
+
+## Before and after
+
+The cleaning drops no rows: `{r} nrow(folivory_raw)` before, `{r} nrow(folivory_clean)` after.
+
+```{r}
+#| label: tbl-names
+#| tbl-cap: "Column names before and after cleaning (first 6)."
+kable(head(tibble::tibble(before = names(naive), after = names(folivory_clean)), 6))
+```
+
+```{r}
+#| label: tbl-na-counts
+#| tbl-cap: "Missing values after cleaning (columns with at least one)."
+na_counts <- colSums(is.na(folivory_clean))
+kable(tibble::enframe(na_counts[na_counts > 0], name = "column", value = "n_missing"))
+```
+
+Experimental damage (0, 10, 25 and 50 per cent of leaf area, from the codebook) becomes an ordered factor:
+
+```{r}
+#| label: tbl-damage-levels
+#| tbl-cap: "Plants per experimental damage level."
+kable(count(folivory_clean, experimental_damage_2013))
+```
+
+If the CSV is read without `na.strings`, the function stops with a clear message instead of returning text columns:
+
+```{r}
+#| label: guard-example
+tryCatch(clean_folivory(naive), error = function(e) conditionMessage(e))
+```
+
+The cleaned CSV keeps the factor labels but not their order, so analyses should use the `folivory_clean` target rather than reading `data/clean/folivory_clean.csv` back in.
+
+# Pipeline
+
+```{r}
+#| label: show-targets
+#| file: _targets.R
+#| eval: false
+```
+
+# Computational environment
+
+Package versions are recorded in `renv.lock`; the session that rendered this document was:
+
+```{r}
+#| label: session-info
+sessionInfo()
+```
