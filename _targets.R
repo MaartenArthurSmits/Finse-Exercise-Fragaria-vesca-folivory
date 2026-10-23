@@ -1,6 +1,7 @@
 # Pipeline. Run from the project root: targets::tar_make()
 # Course ref: Thursday "reproducible workflows" (targets); guide section T.
 library(targets)
+library(quarto) # needed by tarchetypes::tar_quarto(); listing it records it in renv.lock
 
 # Loads clean_folivory() and plot_fruits() from R/
 tar_source("R")
