@@ -1,0 +1,13 @@
+# RStudio project for the Finse reproducibility exercise.
+# To reproduce everything, run in the R console:
+#   renv::restore()      # install the package versions in renv.lock
+#   targets::tar_make()  # clean the data, make the figure, render report.html
+# Results are rebuilt from scripts, so no workspace is saved or restored below.
+
+Version: 1.0
+
+RestoreWorkspace: No
+SaveWorkspace: No
+AlwaysSaveHistory: No
+
+Encoding: UTF-8

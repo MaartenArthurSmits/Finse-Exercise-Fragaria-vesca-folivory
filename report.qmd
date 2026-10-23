@@ -5,7 +5,8 @@ format:
     embed-resources: true
 ---
 
-This report shows how `data/clean/folivory_clean.csv` is obtained from the published raw data, and checks each step. To reproduce it, run from the project root:
+This report shows how `data/clean/folivory_clean.csv` is obtained from the published raw data, and checks each step.
+To reproduce it, run from the project root:
 
 ``` r
 renv::restore()      # install the package versions in renv.lock
