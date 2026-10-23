@@ -2,7 +2,8 @@
 title: "Reproducing the folivory data: from the raw file to the cleaned table"
 ---
 
-This document shows how the cleaned data in `data/clean/folivory_clean.csv` are obtained from the published raw file, and lets a reader check each step. It is rendered by the pipeline, so every table below comes from the code in this repository.
+This document shows how the cleaned data in `data/clean/folivory_clean.csv` are obtained from the published raw file, and lets a reader check each step.
+It is rendered by the pipeline, so every table below comes from the code in this repository.
 
 # How to reproduce
 
@@ -10,14 +11,14 @@ Run these from the project root (the folder containing `README.md`).
 
 In the R console:
 
-```r
+``` r
 renv::restore()      # install the package versions recorded in renv.lock
 targets::tar_make()  # clean the data and render this report (report.html)
 ```
 
 Or only render this document, using the targets already built:
 
-```bash
+``` bash
 quarto render report.qmd
 ```
 
@@ -29,7 +30,9 @@ library(knitr)
 
 # Data source
 
-Muola & Stenberg (2018), Dryad dataset [10.5061/dryad.69r593t](https://doi.org/10.5061/dryad.69r593t), licence CC0 1.0. The paper is [10.1002/ece3.4687](https://doi.org/10.1002/ece3.4687). The raw Excel file is kept unedited in `data/raw/`; its checksum is compared with the one on the dataset record.
+Muola & Stenberg (2018), Dryad dataset [10.5061/dryad.69r593t](https://doi.org/10.5061/dryad.69r593t), licence CC0 1.0.
+The paper is [10.1002/ece3.4687](https://doi.org/10.1002/ece3.4687).
+The raw Excel file is kept unedited in `data/raw/`; its checksum is compared with the one on the dataset record.
 
 ```{r}
 #| label: tbl-md5
@@ -45,7 +48,9 @@ kable(tibble::tibble(
 
 # From Excel to CSV
 
-The workbook has two sheets: `data` (186 plants) and `code`, the authors' codebook with units and level definitions. Each sheet was exported once to `data/csv/` with `readxl::read_excel(.name_repair = "minimal")` and `write.csv()`, with no cleaning. To check that nothing was changed, the export is repeated in memory and compared with the CSV files in the repository:
+The workbook has two sheets: `data` (186 plants) and `code`, the authors' codebook with units and level definitions.
+Each sheet was exported once to `data/csv/` with `readxl::read_excel(.name_repair = "minimal")` and `write.csv()`, with no cleaning.
+To check that nothing was changed, the export is repeated in memory and compared with the CSV files in the repository:
 
 ```{r}
 #| label: tbl-csv-check
@@ -59,7 +64,8 @@ kable(bind_rows(lapply(readxl::excel_sheets(raw_xlsx), function(s) {
 
 # Cleaning
 
-`clean_folivory()` does the cleaning. Its source is shown below; this cell also defines the function for the rest of the document.
+`clean_folivory()` does the cleaning.
+Its source is shown below; this cell also defines the function for the rest of the document.
 
 ```{r}
 #| label: clean-function
@@ -68,7 +74,8 @@ kable(bind_rows(lapply(readxl::excel_sheets(raw_xlsx), function(s) {
 
 ## Missing values
 
-The authors code missing values as `"."`. Read naively, six numeric columns become text; reading with `na.strings = c("", ".")` fixes this.
+The authors code missing values as `"."`.
+Read naively, six numeric columns become text; reading with `na.strings = c("", ".")` fixes this.
 
 ```{r}
 #| label: read-data
