@@ -1,7 +1,8 @@
 # Pipeline. Run from the project root: targets::tar_make()
 # Course ref: Thursday "reproducible workflows" (targets); guide section T.
 library(targets)
-library(quarto) # needed by tarchetypes::tar_quarto(); listing it records it in renv.lock
+# Needed by tarchetypes::tar_quarto(); listing it records it in renv.lock
+library(quarto)
 
 # Loads clean_folivory() and plot_fruits() from R/
 tar_source("R")
@@ -19,7 +20,10 @@ list(
     {
       out <- "data/clean/folivory_clean.csv"
       dir.create(dirname(out), showWarnings = FALSE)
-      write.csv(folivory_clean, out, row.names = FALSE, na = "", fileEncoding = "UTF-8")
+      write.csv(
+        folivory_clean, out,
+        row.names = FALSE, na = "", fileEncoding = "UTF-8"
+      )
       out
     },
     format = "file"
